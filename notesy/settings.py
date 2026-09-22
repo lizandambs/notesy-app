@@ -2,15 +2,26 @@
 import os
 from pathlib import Path
 
+import dj_database_url
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = "django-insecure-replace-me-eventually-l0lz-h4xx-9000"
 
-DEBUG = True
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
-ALLOWED_HOSTS = ["*"]
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() == "true"
 
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "localhost,127.0.0.1",
+    ).split(",")
+    if host.strip()
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -54,10 +65,10 @@ WSGI_APPLICATION = "notesy.wsgi.application"
 
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.parse(
+        os.environ["DATABASE_URL"],
+        conn_max_age=600,
+    )
 }
 
 
@@ -79,7 +90,6 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
