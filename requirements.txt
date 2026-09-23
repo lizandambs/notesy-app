@@ -6,3 +6,4 @@ python-dotenv
 pytest
 pytest-django
 dj-database-url==3.1.2
+whitenoise

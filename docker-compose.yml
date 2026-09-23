@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: notesy
+      POSTGRES_USER: notesy
+      POSTGRES_PASSWORD: notesy_dev_pw
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U notesy -d notesy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://notesy:notesy_dev_pw@db:5432/notesy
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py seed &&
+             python manage.py collectstatic --noinput &&
+             gunicorn --bind 0.0.0.0:8000 notesy.wsgi:application"
+
+volumes:
+  postgres_data:

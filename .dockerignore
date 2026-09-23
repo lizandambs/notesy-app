@@ -1,4 +1,6 @@
 .env
+.git
+.gitignore
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -7,5 +9,4 @@ htmlcov/
 staticfiles/
 node_modules/
 *.log
-.DS_Store
-static/
+.sessions/
